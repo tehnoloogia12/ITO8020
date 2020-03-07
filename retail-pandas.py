@@ -12,24 +12,19 @@ df.dropna(axis=0, subset=['InvoiceNo'], inplace=True)
 
 df['InvoiceNo'] = df['InvoiceNo'].astype('str')
 df = df[~df['InvoiceNo'].str.contains('C')]
-#####df.to_csv('C:\\Users\\pealik\\Documents\\kodu2\\dataframe1.csv', index=False, header=True)
-#print(df)
 
-
-#basket = (df[df['Country'] =="France"]
+#algselt basket = (df[df['Country'] =="France"]
 basket = (df[df['Country'] =="United Kingdom"]
           .groupby(['InvoiceNo', 'Description'])['Quantity']
           .sum().unstack().reset_index().fillna(0)
           .set_index('InvoiceNo'))
 print('--- basket')
 print(basket)
-#basket
+
 df=basket
+# ekspordi kõik basketid
 #df.to_csv('C:\\Users\\pealik\\Documents\\kodu2\\df2-basket.csv', index=False, header=True)
 
-
-
-#print(basket)
 def encode_units(x):
     if x <= 0:
         return 0
@@ -39,23 +34,17 @@ def encode_units(x):
 basket_sets = basket.applymap(encode_units)
 basket_sets.drop('POSTAGE', inplace=True, axis=1)
 
-#print('--- basket_sets')
-#print(basket_sets)
 df=basket_sets
+# ekspordi csv-sse
 #df.to_csv('C:\\Users\\pealik\\Documents\\kodu2\\df3-basket_sets.csv', index=False, header=True)
-#print(df)
+
 # originaalis min_support=0.07, vähendame selle 0.02 peale
 frequent_itemsets = apriori(basket_sets, min_support=0.02, use_colnames=True)
 rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
 
-#print('--- rules.head')
-#print(rules.head())
-#### reeglieid tuleks muuta
 rules[ (rules['lift'] >= 6) &
       (rules['confidence'] >= 0.8) ]
 
-#print('--- rules')
-#print(rules)
 df=rules
+# ekspordi lõpptulem
 df.to_csv('C:\\Users\\pealik\\Documents\\kodu2\\df4-rules-conf80-lift6.csv', index=False, header=True)
-#print(df)
